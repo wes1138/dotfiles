@@ -40,8 +40,8 @@ alias hglp='hg log -p'
 
 # Other random stuff
 alias mo='mimeo'
-alias ff='(firefox &> /dev/null && pkill at-spi &)'
-alias fp='(firefox -private &> /dev/null && pkill at-spi &)'
+alias ff='(firefox &> /dev/null && sleep 1 && pkill "(at-spi|gconfd)" &)'
+alias fp='(firefox -private &> /dev/null && sleep 1 && pkill "(at-spi|gconfd)" &)'
 
 #}}}
 
@@ -128,13 +128,13 @@ tmouse() {
 }
 
 zo() {
-	(zathura --fork "$@" &> /dev/null && pkill at-spi &)
+	(zathura --fork "$@" &> /dev/null && sleep 1 && pkill at-spi &)
 }
 
 zl() {
 	local f="$(ls -t /tmp/*.pdf | head -1)"
 	echo "Opening $f"
-	(zathura --fork "$f" &> /dev/null && pkill at-spi &)
+	(zathura --fork "$f" &> /dev/null && sleep 1 && pkill at-spi &)
 }
 
 cal() {
@@ -210,15 +210,6 @@ recn() {
 		| sort -k 1nr | sed 's/^[^ ]* //' | head -$num
 }
 
-pdfgrep() {
-	local basecmd='pdftotext "{}" - | grep --with-filename --label="{}" -i --color=always'
-	local findopt="-size -3M"
-	[[ $1 == "--all" ]] && findopt="" && shift
-	# NOTE: quoting of $@ is tricky to fix... use nested quotes for now.
-	basecmd="${basecmd} $@"
-	find ./ -name '*.pdf' $findopt -exec sh -c "$basecmd" \;
-}
-
 throwaway_c() {
 	local tdir=$(mktemp -d /tmp/deleteme-XXX)
 	cd $tdir
@@ -278,7 +269,7 @@ j() {
 
 mark() {
 	[[ -z $1 ]] && markname=$(basename $PWD) || markname=$1
-	ln -sv $PWD ~/.config/marks/$1
+	ln -sv $PWD ~/.config/marks/$markname
 }
 
 unmark() {
